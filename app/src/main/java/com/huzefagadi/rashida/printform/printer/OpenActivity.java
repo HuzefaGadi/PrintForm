@@ -9,6 +9,7 @@ import android.view.View.OnClickListener;
 import android.view.WindowManager.LayoutParams;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -32,6 +33,8 @@ SharedPreferences sharedPreferences;
     SharedPreferences.Editor edit;
     StartActivity global;
     ToggleButton toggleStatusMonitor ;
+    RadioGroup radioGroup;
+    RadioButton epsonPrinter,wifiPrinter;
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -130,8 +133,20 @@ SharedPreferences sharedPreferences;
         textInterval.setText(interval+"");
 
         //Registration ClickListener
-        Button button = (Button) findViewById(R.id.button_open);
+        Button button = (Button) findViewById(R.id.button_save);
         button.setOnClickListener(this);
+        int checkedId = sharedPreferences.getInt("SELECTED_PRINTER",1);
+        radioGroup = (RadioGroup) findViewById(R.id.printerSelect);
+        epsonPrinter = (RadioButton)findViewById(R.id.epsonPrinter);
+        wifiPrinter = (RadioButton)findViewById(R.id.wifiPrinter);
+        if(checkedId == 1)
+        {
+            radioGroup.check(R.id.epsonPrinter);
+        }
+        else
+        {
+            radioGroup.check(R.id.wifiPrinter);
+        }
 
         //hide keyboard
         this.getWindow().setSoftInputMode(LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
@@ -139,11 +154,21 @@ SharedPreferences sharedPreferences;
 
     @Override
     public void onClick(View v) {
-        openPrinter();
+        savePrinter();
     }
 
-    private void openPrinter() {
+    private void savePrinter() {
         //get open parameter
+
+        int checkedId = radioGroup.getCheckedRadioButtonId();
+        if (checkedId == R.id.epsonPrinter) {
+            edit.putInt("SELECTED_PRINTER", 1);
+        } else {
+            edit.putInt("SELECTED_PRINTER", 2);
+        }
+        sharedPreferences.edit().commit();
+
+
         TextView textIp = (TextView) findViewById(R.id.editText_ip);
         if (textIp.getText().toString().isEmpty()) {
             ShowMsg.showError(R.string.errmsg_noaddress, this);

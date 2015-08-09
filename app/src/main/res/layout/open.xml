@@ -152,8 +152,39 @@
             </TableRow>
         </TableLayout>
 
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginTop="20dp"
+            android:layout_weight="2">
+
+
+            <RadioGroup
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="horizontal"
+                android:id="@+id/printerSelect">
+
+
+                <RadioButton
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="EPSON Printer"
+                    android:id="@+id/epsonPrinter"
+                    android:layout_weight="1"/>
+
+                <RadioButton
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Wifi Printer"
+                    android:layout_weight="1"
+                    android:id="@+id/wifiPrinter" />
+            </RadioGroup>
+        </RelativeLayout>
+
         <Button
-            android:id="@+id/button_open"
+            android:id="@+id/button_save"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="10dp"

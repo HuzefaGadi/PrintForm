@@ -25,6 +25,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ToggleButton;
 
+import com.RT_Printer.WIFI.WifiPrintDriver;
 import com.epson.eposprint.BatteryStatusChangeEventListener;
 import com.epson.eposprint.Builder;
 import com.epson.eposprint.EposException;
@@ -38,6 +39,7 @@ import com.huzefagadi.rashida.printform.printer.ShowMsg;
 import com.huzefagadi.rashida.printform.printer.TextActivity;
 import com.huzefagadi.rashida.printform.utility.Constants;
 import com.huzefagadi.rashida.printform.utility.DatabaseHandler;
+import com.huzefagadi.rashida.printform.utility.Utils;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -741,109 +743,156 @@ public class MainActivity extends Activity implements StatusChangeEventListener,
 
     private void printText(String text) {
 
-        global = (StartActivity) getApplicationContext();
-        Print printer = global.getPrinter();
+        int checkedId = sharedPreferences.getInt("SELECTED_PRINTER",1);
         String deviceName = sharedPreferences.getString(Constants.PRINTER_OPEN_DEVICE_NAME, "");
-        int enabled = sharedPreferences.getInt(Constants.PRINTER_ENABLED, 0);
-        int interval = sharedPreferences.getInt(Constants.PRINTER_INTERVAL, 0);
-        if (printer == null && !deviceName.equals("")) {
-            printer = new Print(getApplicationContext());
+        if(checkedId==R.id.epsonPrinter) {
+            global = (StartActivity) getApplicationContext();
+            Print printer = global.getPrinter();
 
-            try {
-                printer.openPrinter(global.getConnectionType(), global.getOpenDeviceName(), enabled, interval);
-                printer.setStatusChangeEventCallback(this);
-                printer.setBatteryStatusChangeEventCallback(this);
+            int enabled = sharedPreferences.getInt(Constants.PRINTER_ENABLED, 0);
+            int interval = sharedPreferences.getInt(Constants.PRINTER_INTERVAL, 0);
+            if (printer == null && !deviceName.equals("")) {
+                printer = new Print(getApplicationContext());
 
-
-            } catch (Exception e) {
-                printer = null;
-                ShowMsg.showException(e, "openPrinter", this);
-
-            }
-
-            global.setPrinter(printer);
-
-        }
-        if (printer == null) {
-            Toast.makeText(getApplicationContext(), "Please setup Printer first", Toast.LENGTH_SHORT).show();
-
-        } else {
-
-
-            if (text.isEmpty()) {
-                ShowMsg.showError(R.string.errmsg_notext, this);
-                return;
-            }
-
-            Builder builder = null;
-            String method = "";
-            try {
-                //create builder
-
-                method = "Builder";
-                builder = new Builder(global.getPrinterName(), global.getLanguage(), getApplicationContext());
-
-                //add command
-                method = "addTextFont";
-                builder.addTextFont(getBuilderFont());
-
-                method = "addTextAlign";
-                builder.addTextAlign(getBuilderAlign());
-
-                method = "addTextLineSpace";
-                builder.addTextLineSpace(getBuilderLineSpace());
-
-                method = "addTextLang";
-                builder.addTextLang(getBuilderLanguage());
-
-                method = "addTextSize";
-                builder.addTextSize(getBuilderSizeW(), getBuilderSizeH());
-
-                method = "addTextStyle";
-                builder.addTextStyle(Builder.FALSE, getBuilderStyleUnderline(), getBuilderStyleBold(), Builder.COLOR_1);
-
-                method = "addTextPosition";
-                builder.addTextPosition(getBuilderXPosition());
-
-                method = "addText";
-                builder.addText(text);
-
-                method = "addFeedLine";
-                builder.addFeedLine(getBuilderFeedUnit());
-
-                method = "addCut";
-                builder.addCut(getBuilderType());
-
-                //send builder data
-                int[] status = new int[1];
-                int[] battery = new int[1];
                 try {
+                    printer.openPrinter(global.getConnectionType(), global.getOpenDeviceName(), enabled, interval);
+                    printer.setStatusChangeEventCallback(this);
+                    printer.setBatteryStatusChangeEventCallback(this);
 
-                    printer.sendData(builder, SEND_TIMEOUT, status, battery);
-                    ShowMsg.showStatus(EposException.SUCCESS, status[0], battery[0], this);
-                    stopPrinter();
-                } catch (EposException e) {
-                    e.printStackTrace();
-                    System.out.println("error occured : " + e.getErrorStatus());
-                    ShowMsg.showStatus(e.getErrorStatus(), e.getPrinterStatus(), e.getBatteryStatus(), this);
-                    stopPrinter();
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
 
-                ShowMsg.showException(e, method, this);
-                stopPrinter();
-            }
-
-            //remove builder
-            if (builder != null) {
-                try {
-                    builder.clearCommandBuffer();
-                    builder = null;
                 } catch (Exception e) {
-                    builder = null;
+                    printer = null;
+                    ShowMsg.showException(e, "openPrinter", this);
+
+                }
+
+                global.setPrinter(printer);
+
+            }
+            if (printer == null) {
+                Toast.makeText(getApplicationContext(), "Please setup Printer first", Toast.LENGTH_SHORT).show();
+
+            } else {
+
+
+                if (text.isEmpty()) {
+                    ShowMsg.showError(R.string.errmsg_notext, this);
+                    return;
+                }
+
+                Builder builder = null;
+                String method = "";
+                try {
+                    //create builder
+
+                    method = "Builder";
+                    builder = new Builder(global.getPrinterName(), global.getLanguage(), getApplicationContext());
+
+                    //add command
+                    method = "addTextFont";
+                    builder.addTextFont(getBuilderFont());
+
+                    method = "addTextAlign";
+                    builder.addTextAlign(getBuilderAlign());
+
+                    method = "addTextLineSpace";
+                    builder.addTextLineSpace(getBuilderLineSpace());
+
+                    method = "addTextLang";
+                    builder.addTextLang(getBuilderLanguage());
+
+                    method = "addTextSize";
+                    builder.addTextSize(getBuilderSizeW(), getBuilderSizeH());
+
+                    method = "addTextStyle";
+                    builder.addTextStyle(Builder.FALSE, getBuilderStyleUnderline(), getBuilderStyleBold(), Builder.COLOR_1);
+
+                    method = "addTextPosition";
+                    builder.addTextPosition(getBuilderXPosition());
+
+                    method = "addText";
+                    builder.addText(text);
+
+                    method = "addFeedLine";
+                    builder.addFeedLine(getBuilderFeedUnit());
+
+                    method = "addCut";
+                    builder.addCut(getBuilderType());
+
+                    //send builder data
+                    int[] status = new int[1];
+                    int[] battery = new int[1];
+                    try {
+
+                        printer.sendData(builder, SEND_TIMEOUT, status, battery);
+                        ShowMsg.showStatus(EposException.SUCCESS, status[0], battery[0], this);
+                        stopPrinter();
+                    } catch (EposException e) {
+                        e.printStackTrace();
+                        System.out.println("error occured : " + e.getErrorStatus());
+                        ShowMsg.showStatus(e.getErrorStatus(), e.getPrinterStatus(), e.getBatteryStatus(), this);
+                        stopPrinter();
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+
+                    ShowMsg.showException(e, method, this);
+                    stopPrinter();
+                }
+
+                //remove builder
+                if (builder != null) {
+                    try {
+                        builder.clearCommandBuffer();
+                        builder = null;
+                    } catch (Exception e) {
+                        builder = null;
+                    }
                 }
             }
+        }
+        else
+        {
+            String tmpStr = deviceName;
+            String ipAddress = "";
+            String tmpPort = "";
+            int port = 9100;
+            String[] strings = Utils.StringSplit(tmpStr, ":");
+            ipAddress = strings[0];
+            tmpPort = strings[1];
+            port = Integer.parseInt(tmpPort);
+
+
+            // ����WIFI
+            if(!WifiPrintDriver.WIFISocket(ipAddress, port))
+            {
+                WifiPrintDriver.Close();
+               Toast.makeText(this,"Connection to wifi printer failed",Toast.LENGTH_LONG).show();
+            }
+            else
+            {
+                Toast.makeText(this,"Connection to wifi printer success",Toast.LENGTH_LONG).show();
+
+                if(WifiPrintDriver.IsNoConnection()){
+                    return;
+                }
+                WifiPrintDriver.Begin();
+
+                String tmpContent = text;
+                WifiPrintDriver.ImportData(tmpContent);
+                WifiPrintDriver.ImportData("\r");
+                WifiPrintDriver.excute();
+                WifiPrintDriver.ClearData();
+            }
+           /* WifiPrintDriver.Begin();
+
+            String tmpString = PrinterOptionActivity.this.getResources().getString(R.string.print_text_content);
+            WifiPrintDriver.ImportData(tmpString);
+            WifiPrintDriver.ImportData("\r");
+            WifiPrintDriver.LF();
+            WifiPrintDriver.LF();
+            WifiPrintDriver.excute();
+            WifiPrintDriver.ClearData();*/
         }
     }
 

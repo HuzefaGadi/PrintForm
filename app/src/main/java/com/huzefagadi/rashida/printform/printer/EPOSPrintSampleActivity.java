@@ -25,8 +25,7 @@ public class EPOSPrintSampleActivity extends Activity implements OnClickListener
     static Print printer = null;
     StartActivity global;
     SharedPreferences sharedPreferences;
-    RadioGroup radioGroup;
-    RadioButton epsonPrinter,wifiPrinter;
+
 
 
     /**
@@ -53,24 +52,7 @@ public class EPOSPrintSampleActivity extends Activity implements OnClickListener
             button.setOnClickListener(this);
         }
 
-        radioGroup = (RadioGroup) findViewById(R.id.printerSelect);
-        epsonPrinter = (RadioButton)findViewById(R.id.epsonPrinter);
-        wifiPrinter = (RadioButton)findViewById(R.id.wifiPrinter);
-        radioGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(RadioGroup group, int checkedId) {
 
-                if(checkedId == R.id.epsonPrinter)
-                {
-                    sharedPreferences.edit().putInt("SELECTED_PRINTER", 1);
-                }
-                else
-                {
-                    sharedPreferences.edit().putInt("SELECTED_PRINTER",2);
-                }
-                sharedPreferences.edit().commit();
-            }
-        });
         //update button state
         updateButtonState();
     }
