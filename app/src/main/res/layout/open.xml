@@ -152,6 +152,29 @@
             </TableRow>
         </TableLayout>
 
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp">
+
+            <TextView
+                android:id="@+id/linespacetext"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Line Spacing"/>
+
+
+            <EditText
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:inputType="number"
+                android:ems="10"
+                android:layout_toRightOf="@+id/linespacetext"
+                android:layout_alignBaseline="@+id/linespacetext"
+                android:id="@+id/linespacing"
+                android:layout_gravity="center_horizontal" />
+
+        </RelativeLayout>
 
         <RelativeLayout
             android:layout_width="match_parent"

@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.os.StrictMode;
 import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -85,6 +86,9 @@ public class MainActivity extends Activity implements StatusChangeEventListener,
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         context = this;
+        StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
+        StrictMode.setThreadPolicy(policy);
+
         sharedPreferences = getSharedPreferences(Constants.SHARED_PREFERENCES, MODE_PRIVATE);
         edit = sharedPreferences.edit();
         db = new DatabaseHandler(context);
@@ -863,11 +867,11 @@ public class MainActivity extends Activity implements StatusChangeEventListener,
             port = Integer.parseInt(tmpPort);
 
 
-            // ����WIFI
+            // ????WIFI
             if(!WifiPrintDriver.WIFISocket(ipAddress, port))
             {
                 WifiPrintDriver.Close();
-               Toast.makeText(this,"Connection to wifi printer failed",Toast.LENGTH_LONG).show();
+                Toast.makeText(this,"Connection to wifi printer failed",Toast.LENGTH_LONG).show();
             }
             else
             {
@@ -879,7 +883,20 @@ public class MainActivity extends Activity implements StatusChangeEventListener,
                 WifiPrintDriver.Begin();
 
                 String tmpContent = text;
+                WifiPrintDriver.LF();
+                WifiPrintDriver.LF();
+                WifiPrintDriver.LF();
+                WifiPrintDriver.LF();
+                WifiPrintDriver.LF();
+                WifiPrintDriver.SetZoom((byte) 0x01);
                 WifiPrintDriver.ImportData(tmpContent);
+                int lineSpaces = sharedPreferences.getInt("LINE_SPACING_WIFI_PRINTER",8);
+                for(int i =0;i<lineSpaces;i++)
+                {
+                    WifiPrintDriver.LF();
+                }
+
+                WifiPrintDriver.ImportData(new byte[]{0x1b, 0x6d}, 2);
                 WifiPrintDriver.ImportData("\r");
                 WifiPrintDriver.excute();
                 WifiPrintDriver.ClearData();
@@ -1023,4 +1040,5 @@ public class MainActivity extends Activity implements StatusChangeEventListener,
         }
     }
 }
+
 

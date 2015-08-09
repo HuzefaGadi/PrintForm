@@ -9,6 +9,7 @@ import android.view.View.OnClickListener;
 import android.view.WindowManager.LayoutParams;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.Spinner;
@@ -29,12 +30,13 @@ public class OpenActivity extends Activity implements OnClickListener, StatusCha
     /**
      * Called when the activity is first created.
      */
-SharedPreferences sharedPreferences;
+    SharedPreferences sharedPreferences;
     SharedPreferences.Editor edit;
     StartActivity global;
     ToggleButton toggleStatusMonitor ;
     RadioGroup radioGroup;
     RadioButton epsonPrinter,wifiPrinter;
+    EditText lineSpacing;
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -42,8 +44,13 @@ SharedPreferences sharedPreferences;
         global= (StartActivity)getApplicationContext();
         sharedPreferences = getSharedPreferences(Constants.SHARED_PREFERENCES, MODE_PRIVATE);
         edit = sharedPreferences.edit();
-
+        lineSpacing = (EditText)findViewById(R.id.linespacing);
         toggleStatusMonitor = (ToggleButton) findViewById(R.id.toggleButton_statusmonitor);
+        int lineSpacingNumber = sharedPreferences.getInt("LINE_SPACING_WIFI_PRINTER",8);
+
+        lineSpacing.setText(lineSpacingNumber+"");
+
+
         int enabled = sharedPreferences.getInt(Constants.PRINTER_ENABLED,0);
 
         if(enabled == 0)
@@ -166,7 +173,8 @@ SharedPreferences sharedPreferences;
         } else {
             edit.putInt("SELECTED_PRINTER", 2);
         }
-        sharedPreferences.edit().commit();
+        edit.putInt("LINE_SPACING_WIFI_PRINTER",Integer.parseInt(lineSpacing.getText().toString()));
+
 
 
         TextView textIp = (TextView) findViewById(R.id.editText_ip);
@@ -281,3 +289,4 @@ SharedPreferences sharedPreferences;
         ;
     }
 }
+
